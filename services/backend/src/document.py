@@ -1,4 +1,4 @@
-from line import Line
+from src.line import Line
 
 # Points table to map a grade to a point value.
 POINTS_TABLE = {
@@ -42,6 +42,7 @@ def irrelevant_matches(s: str):
             'MATEMATIIKAN, FYSIIKAN JA KEMIAN OPETTAJAN' in s or
             'JULKISOIKEUS (ON-J2000)' in s or
             'OIKEUSNOTAARIN KOULUTUSOHJELMA' in s or
+            'TIETOJENKÄSITTELYTIETEEN KOULUTUSOHJELMA (ALEMPI)' in s or
             'USKONTOTIEDE II, OPINTOKOKONAISUUS' in s or
             len(s) < 14 or
             len(s.strip().split('   ')) < 5)
@@ -192,24 +193,26 @@ class Document:
 
         return
 
-    def write_csv(self, output_directory):
+    def get_csv(self):
         """
         Write the parsed data to a csv file.
         :param output_directory:  Output directory path
         """
         first_names = self.first_names.replace(' ', '_')
-        if output_directory[-1] != '/':
-            output_directory += '/'
-        with open(f'{output_directory}{self.last_name}_{first_names}.csv', 'w', encoding='utf-8') as f:
-            f.write('"kurssi","opintopisteet","kieli","arvosana","pvm","arvostelupisteet"\n')
-            for c in self.courses:
-                name = c['name']
-                creds = c['credits']
-                language = c['language'] if 'language' in c else ''
-                if language == '\ufb01':
-                    language = 'fi'
-                grade = c['grade']
-                date = c['date']
-                f.write(f'"{name}","{creds}","{language}","{grade}","{date}","{(creds * POINTS_TABLE[grade])}"\n')
+        filename = f'{self.last_name}_{first_names}.csv'
 
-            f.write(f'\n"Opintopisteitä yhteensä","{self.total_credits_check}","Parserin laskemat opintopisteet","{self.credits}","Arvostelupisteet", "{self.points}"')
+        content = ""
+
+        content += '"kurssi","opintopisteet","kieli","arvosana","pvm","arvostelupisteet"\n'
+        for c in self.courses:
+            name = c['name']
+            creds = c['credits']
+            language = c['language'] if 'language' in c else ''
+            if language == '\ufb01':
+                language = 'fi'
+            grade = c['grade']
+            date = c['date']
+            content += f'"{name}","{creds}","{language}","{grade}","{date}","{(creds * POINTS_TABLE[grade])}"\n'
+
+        content += f'\n"Opintopisteitä yhteensä","{self.total_credits_check}","Parserin laskemat opintopisteet","{self.credits}","Arvostelupisteet", "{self.points}"'
+        return filename, content

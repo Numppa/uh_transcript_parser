@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <title>Suoritusotteen taulukointi</title>
+</head>
+<h1>Käännä suoritusote taulukoksi</h1>
+<body>
+  <form method="post" enctype="multipart/form-data">
+  <input type="file" id="file" accept="application/pdf" multiple /><br/><br/>
+  <button>Lataa tiedosto</button>
+  </form>
+  <footer>
+    Sovellus on tarkoitettu Hämäläisten ylioppilassäätiön stipendihakemusten arviointia varten. Sovellus ei tallenna otteita palvelimelle. Ylläpitäjä: Joel Nummelin
+  </footer>
+<script>
+    const fileInput = document.getElementById('file');
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        fetch('http://localhost:5000/api/parse', {
+        method: 'POST',
+        body: formData
+        }).then(response => {
+          const header = response.headers.get('Content-Disposition');
+          const parts = header.split(';');
+          filename = parts[1].split('=')[1].replaceAll("\"", "");
+          return response;
+        }).then(response => response.blob())
+        .then(blob => {
+        var file = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = file;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        })
+    });
+</script>
+</body>
+</html>
