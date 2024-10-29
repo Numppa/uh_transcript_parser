@@ -43,16 +43,20 @@ def parse(file: UploadFile = File(...)):
             doc = Document(content)
 
             doc.parse()
+            """
             print(doc.first_names)
             print(doc.last_name)
             print(doc.student_number)
             print(doc.birth_time)
             print(doc.total_credits_check)
             print(doc.credits)
-            if doc.credits != doc.total_credits_check:
-                print("HUOM! lasketut opintopisteet eivät täsmää! Todennäköisesti dokumentin lukemisessa virhe. ")
+            """
 
         filename, csv_string = doc.get_csv()
+
+        if doc.credits != doc.total_credits_check:
+            filename = "X_" + filename
+            # print("HUOM! lasketut opintopisteet eivät täsmää! Todennäköisesti dokumentin lukemisessa virhe. ")
 
         stream = io.StringIO()
         stream.write(csv_string)
