@@ -3,48 +3,33 @@ A simple parsing tool to convert a University of Helsinki transcript of studies 
 This tool is meant to speed up the process of reviewing stipend applications.
 
 
-## Requirements
-- Python 3.x (tested with 3.11)
-  - No additional libraries needed
-- poppler-utils (to convert PDF to text)
+## Backend
 
-## Usage
+Runs FastAPI deployed to port 5000. There's a single enpoint `/parse` which accepts POST requests with PDF file uploads. 
 
-### Converting PDF File to Text (Debian/Ubuntu)
+Uses pdftotext to convert the PDF into text. The text is converted to CSV with a custom parser
 
-Installing poppler-utils:
-```bash
-sudo apt install poppler-utils
-```
+## Frontend
 
-Converting pdf to text:
-```bash
-pdftotext -layout file.pdf
-```
+A single HTML page (with some JavaScript) served by nginx. Connects to backend via localhost:5000. 
 
-Bulk conversion from pdf to text. Suppose you have all PDF files in a directory named `pdf_files` and 
-the text files will be put into directory `text_files`:
-```bash
-for file in pdf_files/*.pdf; do pdftotext -layout "$file" "text_files/$(basename "$file" .pdf).txt"; done
-```
+## Deployment
 
-### Running the parser
+### Local
 
-Convert a single file (bash or powershell):
-```bash
-python main.py file.txt output_directory/
-```
+Use `docker compose up`
 
-Bulk Conversion (bash). Suppose you have all text files in a directory named `text_files` and
-the CSV files will be put into directory `csv_files`:
-```bash
-for file in text_files/*.txt; do python main.py "$file" csv_files/; done
-```
+You now should have the service running in `localhost:8080`. 
 
-### Reading the CSV
-You can open the CSV files with any spreadsheet software (e.g. LibreOffice Calc, Excel). 
-Comma `,` is used as the delimiter and the encoding is UTF-8.
+### AWS 
 
-If the run is successful, the number of calculated credits (Parserin laskemat opintopisteet) 
-and the number of credits in the transcript (Opintopisteitä yhteensä) should match. 
-The total points for the review is displayed after column `Arvostelupisteet`. 
+The app can be deployed to AWS by using Terraform with ECR and ECS. 
+
+First, create a container registry by applying `/terraform/ecr`. Then, go to the AWS console and follow the instructions to push the images to the registry. Basically, you need to login to ECR, `docker compose build`, then tag the images with `docker tag`, and then `docker push`. 
+
+Register a domain, Create a certificate, and create a hosted zone. 
+
+Apply `terraform/service`. 
+
+You now should have the sercvice running in `<domain-name>:443`
+

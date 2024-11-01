@@ -8,19 +8,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Response
 from fastapi.responses import StreamingResponse
 
-from src.document import Document
+from .document import Document
 
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5000", "http://localhost:8080"],
+    allow_origins=["http://localhost:5000", "http://localhost:80"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.post("/api/parse")
+@app.post("/parse")
 def parse(file: UploadFile = File(...)):
     try:
         contents = file.file.read()
@@ -41,22 +41,12 @@ def parse(file: UploadFile = File(...)):
             os.remove(input_txt)
 
             doc = Document(content)
-
             doc.parse()
-            """
-            print(doc.first_names)
-            print(doc.last_name)
-            print(doc.student_number)
-            print(doc.birth_time)
-            print(doc.total_credits_check)
-            print(doc.credits)
-            """
 
         filename, csv_string = doc.get_csv()
 
         if doc.credits != doc.total_credits_check:
             filename = "X_" + filename
-            # print("HUOM! lasketut opintopisteet eivät täsmää! Todennäköisesti dokumentin lukemisessa virhe. ")
 
         stream = io.StringIO()
         stream.write(csv_string)

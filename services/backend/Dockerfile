@@ -12,5 +12,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY src/ .
+COPY src/ /app/src/
 
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]

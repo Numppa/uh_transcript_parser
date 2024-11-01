@@ -156,3 +156,13 @@ cython_debug/
 
 # PyCharm
 .idea/
+
+# Terraform
+*.tfstate
+.terraform/
+terraform.tfstate*
+.terraform.lock.hcl
+
+# App
+push-to-ecr.ps1
+login-to-repo.sh

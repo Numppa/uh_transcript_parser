@@ -1,4 +1,4 @@
-from src.line import Line
+from .line import Line
 
 # Points table to map a grade to a point value.
 POINTS_TABLE = {

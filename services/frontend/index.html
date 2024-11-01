@@ -20,7 +20,7 @@
         event.preventDefault();
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
-        fetch('http://localhost:5000/api/parse', {
+        fetch('/api/parse', {
         method: 'POST',
         body: formData
         }).then(response => {
